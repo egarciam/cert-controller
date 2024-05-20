@@ -1,0 +1,12 @@
+apiVersion: certchecker.egarciam.com/v1alpha1
+kind: CertificateCheck
+metadata:
+  labels:
+    app.kubernetes.io/name: certificatecheck
+    app.kubernetes.io/instance: certificatecheck-sample
+    app.kubernetes.io/part-of: cert-controller
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: cert-controller
+  name: certificatecheck-sample
+spec:
+  # TODO(user): Add fields here

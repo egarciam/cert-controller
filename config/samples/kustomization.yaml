@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- certchecker_v1alpha1_certificatecheck.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples

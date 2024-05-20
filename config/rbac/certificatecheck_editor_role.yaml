@@ -1,0 +1,31 @@
+# permissions for end users to edit certificatechecks.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: certificatecheck-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: cert-controller
+    app.kubernetes.io/part-of: cert-controller
+    app.kubernetes.io/managed-by: kustomize
+  name: certificatecheck-editor-role
+rules:
+- apiGroups:
+  - certchecker.egarciam.com
+  resources:
+  - certificatechecks
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - certchecker.egarciam.com
+  resources:
+  - certificatechecks/status
+  verbs:
+  - get
