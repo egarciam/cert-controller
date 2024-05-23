@@ -36,7 +36,6 @@ import (
 
 	certcheckerv1alpha1 "github.com/egarciam/cert-checker-operator/api/v1alpha1"
 	"github.com/egarciam/cert-checker-operator/internal/controller"
-	"github.com/egarciam/cert-checker-operator/internal/util"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -132,7 +131,7 @@ func main() {
 	}
 	//+kubebuilder:scaffold:builder
 
-	util.StartAgent()
+	//util.StartAgent()
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")

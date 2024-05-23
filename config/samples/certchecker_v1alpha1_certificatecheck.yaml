@@ -10,3 +10,8 @@ metadata:
   name: certificatecheck-sample
 spec:
   # TODO(user): Add fields here
+  certificates:
+    - secretName: regcred
+      secretNamespace: default
+    - secretName: secret-2
+      secretNamespace: kube-system

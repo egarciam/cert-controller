@@ -6,3 +6,20 @@ images:
 - name: controller
   newName: localhost:5000/egarciam/cert-checker
   newTag: "1.0"
+
+
+# patches:
+# - path: deployment-patch.yaml
+#   target:
+#     labelSelector: control-plane=controller-manager
+
+patches:
+- patch: |-
+    - op: add
+      path: /spec/template/spec/containers/0/imagePullPolicy
+      value: Always
+  target:
+    group: apps
+    kind: Deployment
+    name: controller-manager
+    version: v1
