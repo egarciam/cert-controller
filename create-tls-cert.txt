@@ -1,0 +1,5 @@
+#Create cert with 22 days validity
+openssl req -x509 -nodes -days 22 -newkey rsa:2048 -keyout tls-1.key -out tls-1.crt -subj "/CN=egarciam.github.com"
+
+#Create k8s secret with the cert
+k create secret tls another-tls-secret --key="tls-1.key" --cert="tls-1.crt" -n cert-controller-system

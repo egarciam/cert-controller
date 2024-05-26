@@ -63,7 +63,31 @@ func (r *CertificateCheckReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	}
 
 	// Check certificates in each secret
+	// for _, secret := range secretList.Items {
+	// 	log.Info("Parsing secrets contained in cluster", "secret: ", secret.Name, "secret.Namespace: ", secret.Namespace, "Type:", secret.Type)
+	// 	if secret.Type == SECRET_TLS {
+	// 		for _, certData := range secret.Data {
+	// 			certs, err := r.parseCertificates(certData)
+	// 			if err != nil {
+	// 				//r.Log.Error(err, "Failed to parse certificate", "SecretName", secret.Name, "SecretNamespace", secret.Namespace)
+	// 				log.Error(err, "FAILED to parse certificate", "SecretName", secret.Name, "SecretNamespace", secret.Namespace)
+	// 				continue
+	// 			}
+
+	// 			for _, cert := range certs {
+	// 				if time.Until(cert.NotAfter) < 30*24*time.Hour {
+	// 					log.Info("Certificate is expiring soon",
+	// 						"SecretName", secret.Name,
+	// 						"SecretNamespace", secret.Namespace,
+	// 						"ExpiresAt", cert.NotAfter)
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// Check certificates in each secret
 	for _, secret := range secretList.Items {
+<<<<<<< HEAD
 		log.Info("Parsing secrets contained in cluster", "secret: ", secret.Name, "secret.Namespace: ", secret.Namespace, "DATA:", secret.Data)
 		for _, certData := range secret.Data {
 			certs, err := r.parseCertificates(certData)
@@ -80,6 +104,22 @@ func (r *CertificateCheckReconciler) Reconcile(ctx context.Context, req ctrl.Req
 						"SecretNamespace", secret.Namespace,
 						"ExpiresAt", cert.NotAfter)
 				}
+=======
+		log.Info("Parsing secrets contained in cluster", "secret: ", secret.Name, "secret.Namespace: ", secret.Namespace, "Type:", secret.Type)
+		if secret.Type == SECRET_TLS {
+			cert, err := r.getCertificate(secret.Name, secret.Namespace)
+			if err != nil {
+				//r.Log.Error(err, "Failed to parse certificate", "SecretName", secret.Name, "SecretNamespace", secret.Namespace)
+				log.Error(err, "FAILED to parse certificate", "SecretName", secret.Name, "SecretNamespace", secret.Namespace)
+			}
+
+			//Validate expiry Date for Cert
+			if time.Until(cert.NotAfter) < 30*24*time.Hour {
+				log.Info("Certificate is expiring soon",
+					"SecretName", secret.Name,
+					"SecretNamespace", secret.Namespace,
+					"ExpiresAt", cert.NotAfter)
+>>>>>>> 8decd0c (working in-cluster cert parsing)
 			}
 		}
 	}
@@ -102,8 +142,13 @@ func (r *CertificateCheckReconciler) Reconcile(ctx context.Context, req ctrl.Req
 }
 
 func (r *CertificateCheckReconciler) getCertificate(secretName, secretNamespace string) (*x509.Certificate, error) {
+<<<<<<< HEAD
 	_ = r.Log.WithValues("getCertificates")
 	r.Log.Info("obteniendo certifcados", secretName, secretNamespace)
+=======
+	//_ = r.Log.WithValues("getCertificates")
+	r.Log.Info("obteniendo certificados", secretName, secretNamespace)
+>>>>>>> 8decd0c (working in-cluster cert parsing)
 	secret := &corev1.Secret{}
 	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: secretName, Namespace: secretNamespace}, secret)
 	if err != nil {
@@ -121,7 +166,7 @@ func (r *CertificateCheckReconciler) getCertificate(secretName, secretNamespace 
 	if err != nil {
 		return nil, err
 	}
-
+	r.Log.Info("key:", "issuer:", cert.Issuer, "Expiry Date:", cert.NotAfter)
 	return cert, nil
 }
 
