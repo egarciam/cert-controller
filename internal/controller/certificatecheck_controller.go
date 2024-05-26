@@ -14,8 +14,13 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	certcheckerv1alpha1 "github.com/egarciam/cert-checker-operator/api/v1alpha1"
+)
+
+const (
+	SECRET_TLS = "kubernetes.io/tls"
 )
 
 // CertificateCheckReconciler reconciles a CertificateCheck object
@@ -32,8 +37,9 @@ type CertificateCheckReconciler struct {
 
 func (r *CertificateCheckReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	//_ = r.Log.WithValues("certificatecheck", req.NamespacedName)
-	//log := log.FromContext(ctx) //.WithValues("certificatecheck - v2log: ", req.NamespacedName)
-	log := r.Log.WithValues("reconcile", req.NamespacedName)
+	log := log.FromContext(ctx) //.WithValues("certificatecheck - v2log: ", req.NamespacedName)
+	//log := r.Log.WithValues("reconcile", req.NamespacedName)
+	r.Log = log
 
 	//r.Log.Info("reconciling")
 	//log.Info("reconciling", "NameSpacedName:", req.NamespacedName)
@@ -52,14 +58,9 @@ func (r *CertificateCheckReconciler) Reconcile(ctx context.Context, req ctrl.Req
 
 	// List all secrets in the cluster
 	secretList := &corev1.SecretList{}
+	log.Info("Looking for secrets in cluster:")
 	if err := r.Client.List(ctx, secretList); err != nil {
 		return ctrl.Result{}, err
-	}
-
-	log.Info("items in secret:", "secrets:", fmt.Sprintf("%v", secretList.Items))
-	for _, secret := range secretList.Items {
-		//r.Log.Info("Parsing secrets", "secret: ", secret.Name, "secret.Namespace: ", secret.Namespace)
-		log.Info("Parsing secrets", "secret: ", secret.Name, "secret.Namespace: ", secret.Namespace, "DATA:", secret.Data)
 	}
 
 	// Check certificates in each secret
@@ -87,24 +88,6 @@ func (r *CertificateCheckReconciler) Reconcile(ctx context.Context, req ctrl.Req
 
 	// Check certificates in each secret
 	for _, secret := range secretList.Items {
-<<<<<<< HEAD
-		log.Info("Parsing secrets contained in cluster", "secret: ", secret.Name, "secret.Namespace: ", secret.Namespace, "DATA:", secret.Data)
-		for _, certData := range secret.Data {
-			certs, err := r.parseCertificates(certData)
-			if err != nil {
-				//r.Log.Error(err, "Failed to parse certificate", "SecretName", secret.Name, "SecretNamespace", secret.Namespace)
-				log.Error(err, "Failed to parse certificate", "SecretName", secret.Name, "SecretNamespace", secret.Namespace)
-				continue
-			}
-
-			for _, cert := range certs {
-				if time.Until(cert.NotAfter) < 30*24*time.Hour {
-					log.Info("Certificate is expiring soon",
-						"SecretName", secret.Name,
-						"SecretNamespace", secret.Namespace,
-						"ExpiresAt", cert.NotAfter)
-				}
-=======
 		log.Info("Parsing secrets contained in cluster", "secret: ", secret.Name, "secret.Namespace: ", secret.Namespace, "Type:", secret.Type)
 		if secret.Type == SECRET_TLS {
 			cert, err := r.getCertificate(secret.Name, secret.Namespace)
@@ -119,7 +102,6 @@ func (r *CertificateCheckReconciler) Reconcile(ctx context.Context, req ctrl.Req
 					"SecretName", secret.Name,
 					"SecretNamespace", secret.Namespace,
 					"ExpiresAt", cert.NotAfter)
->>>>>>> 8decd0c (working in-cluster cert parsing)
 			}
 		}
 	}
@@ -142,13 +124,8 @@ func (r *CertificateCheckReconciler) Reconcile(ctx context.Context, req ctrl.Req
 }
 
 func (r *CertificateCheckReconciler) getCertificate(secretName, secretNamespace string) (*x509.Certificate, error) {
-<<<<<<< HEAD
-	_ = r.Log.WithValues("getCertificates")
-	r.Log.Info("obteniendo certifcados", secretName, secretNamespace)
-=======
 	//_ = r.Log.WithValues("getCertificates")
 	r.Log.Info("obteniendo certificados", secretName, secretNamespace)
->>>>>>> 8decd0c (working in-cluster cert parsing)
 	secret := &corev1.Secret{}
 	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: secretName, Namespace: secretNamespace}, secret)
 	if err != nil {
@@ -176,11 +153,13 @@ func (r *CertificateCheckReconciler) parseCertificates(certData []byte) ([]*x509
 	var block *pem.Block
 	var rest = certData
 
-	_ = r.Log.WithValues("parseCertificates")
+	//_ = r.Log.WithValues("function:", "parseCertificates")
 
 	for {
 		block, rest = pem.Decode(rest)
+		fmt.Printf("Cert: %v", rest)
 		if block == nil {
+			r.Log.Info("Breaking")
 			break
 		}
 		if block.Type == "CERTIFICATE" {
@@ -193,7 +172,7 @@ func (r *CertificateCheckReconciler) parseCertificates(certData []byte) ([]*x509
 	}
 
 	if len(certs) == 0 {
-		r.Log.Info("no certificates found")
+		r.Log.Info("En parsecertificates: sno certificates found")
 		return nil, fmt.Errorf("no certificates found")
 	}
 
