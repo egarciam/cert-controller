@@ -3,3 +3,22 @@ openssl req -x509 -nodes -days 22 -newkey rsa:2048 -keyout tls-1.key -out tls-1.
 
 #Create k8s secret with the cert
 k create secret tls another-tls-secret --key="tls-1.key" --cert="tls-1.crt" -n cert-controller-system
+
+# Para crear la imagen para tiltFROM golang:alpine
+WORKDIR /
+# COPY ./bin/manager / # Modificado el contexto para el docker build
+# tilt docker -- build -f tilt.docker -t image-name ./bin
+COPY manager /
+CMD ["/manager"]
+
+
+EN TiltFile
+#docker_build_with_restart(IMG, './bin', 
+docker_build_with_restart(IMG, './bin', 
+ dockerfile='tilt.docker',
+ entrypoint='/manager',
+ #only=['./bin/manager'],
+ live_update=[
+       sync('./bin/manager', '/manager'),
+   ]
+)

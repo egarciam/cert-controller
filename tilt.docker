@@ -1,4 +1,7 @@
 FROM golang:alpine
 WORKDIR /
-COPY ./bin/manager /
+# COPY ./bin/manager / # Modificado el contexto para el docker build
+# tilt docker -- build -f tilt.docker -t image-name ./bin
+COPY manager /
+USER 65532:65532
 CMD ["/manager"]
