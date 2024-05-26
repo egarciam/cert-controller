@@ -181,8 +181,8 @@ func (r *CertificateCheckReconciler) parseCertificates(certData []byte) ([]*x509
 
 func (r *CertificateCheckReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		// For(&certcheckerv1alpha1.CertificateCheck{}).
-		// Owns(&corev1.Secret{}).
+		For(&certcheckerv1alpha1.CertificateCheck{}).
+		Owns(&corev1.Secret{}).
 		// Watches(
 		// 	&source.Kind{
 		// 		mgr.GetCache(),
@@ -192,7 +192,7 @@ func (r *CertificateCheckReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		// 			IsController: true,
 		// 		}},
 		// ).
-		For(&certcheckerv1alpha1.CertificateCheck{}).
+		//For(&certcheckerv1alpha1.CertificateCheck{}).
 		// WithOptions(controller.Options{
 		// 	MaxConcurrentReconciles: 1,
 		// }).
